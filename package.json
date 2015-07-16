@@ -1,0 +1,18 @@
+{
+  "name": "object-formatter",
+  "version": "0.0.1",
+  "description": "format object safely",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha -R spec --recursive test"
+  },
+  "keywords": [
+    "object",
+    "format",
+    "parse",
+    "parser",
+    "formatter"
+  ],
+  "author": "airtoxin <airtoxin@icloud.com>",
+  "license": "MIT"
+}

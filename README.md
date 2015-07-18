@@ -27,17 +27,18 @@ var object = {
 };
 
 var schema = {
-    raw: '"raw value"',
+    raw: 'raw value',
     foo: '@a',
     bar: '@b.c.d="ipsum"',
     baz: {
+        raw: 111,
         a: '@c.cb',
         b: '@c.c.c',
         c: [ '@d', {
-           hoge: '@aa',
-           fuga: '@bb="bbb"'
+            hoge: '@aa',
+            fuga: '@bb="b default"'
         } ],
-        d: [ '@d', '@cc="c--"' ]
+        d: [ '@d', '@cc="c default"' ]
     }
 };
 
@@ -48,16 +49,17 @@ of.format(schema, object);
 //     foo: 'lorem',
 //     bar: 'ipsum',
 //     baz: {
+//         raw: 111,
 //         a: [ 1, 2, 3 ],
 //         b: undefined,
 //         c: [
-//             { hoge: 'a-a', bb: 'b-b' },
-//             { hoge: 'a--', bb: 'b--' },
-//             { hoge: '---', bb: 'bbb' }
+//             { hoge: 'a-a', fuga: 'b-b' },
+//             { hoge: 'a--', fuga: 'b--' },
+//             { hoge: '---', fuga: 'b default' }
 //         ],
-//         d: [ 'c--', 'c--', 'ccc' ]
+//         d: [ 'c default', 'c default', 'ccc' ]
 //     }
-// };
+// }
 ```
 
 ## Constructor

@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "get-value": "^1.1.5",
+    "isobject": "^1.0.2",
     "lodash": "^3.10.0"
   }
 }

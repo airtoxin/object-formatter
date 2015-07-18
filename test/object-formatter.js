@@ -238,6 +238,70 @@ describe('object-formatter', () => {
 	});
 
 	describe('_isAccessor', () => {
+		it('should return true', done => {
+			var of = new ObjectFormatter();
+			var maybeAccessors = [
+				'@simple.accessor',
+				'@a',
+				'@a.b.c.d.e',
+				'@with.default=null',
+				'@with=true',
+				'@a.b.c.d=222',
+				'@uuu="str"',
+				'@uuu=["str", "arr"]',
+				'@uuu=[]',
+				'@uuu=[{}, {f:""}]',
+				'@uuu={ob:"ject"}',
+				'@@@',
+				'@@.@.@',
+				['@path.to.collection', '@collection.accessor'],
+				['@path.to.collection="with default"', '@collectionAccessor.uuu'],
+				['@path.to.collection=111', '@collectionAccessor.uuu="strstr"'],
+				['@path.to.collection=null', '@collectionAccessor.uuu=1'],
+				['@path.to.collection=[null]', {schema:'object'}],
+				['@path.to.collection=[null]', {}],
+				['@path.to.collection=[null]', {schema:["arr"]}],
+				['@path.to.collection=[null]', {a:[{b:[]}]}],
+				['@@@@', '@@']
+			];
+
+			maybeAccessors.forEach(maybeAccessor => {
+				assert.ok(of._isAccessor(maybeAccessor));
+			});
+			done();
+		});
+		it('should return false', done => {
+			var of = new ObjectFormatter();
+			var maynotbeAccessors = [
+				'',
+				'value',
+				'null',
+				null,
+				undefined,
+				true,
+				1,
+				{a:1},
+				[1,2,3],
+				'',
+				'a.@.b',
+				[[]],
+				[{}],
+				['not.accessor', 'hoge'],
+				['aaa', '@accessor'],
+				['a.b.c=1', 'c.b.a=2'],
+				['@a.a', 'str@a.a'],
+				['aaa', {valid: 'schema'}],
+				['aaa', {valid: '@sc.he.ma'}],
+				['@aaa', [1,2,3]],
+				['@@@@', true],
+				[true, '@a.b']
+			];
+
+			maynotbeAccessors.forEach(maynotbeAccessor => {
+				assert.ok(!of._isAccessor(maynotbeAccessor));
+			});
+			done();
+		});
 		it('should return true when accessor is a simple accessor', done => {
 			var of = new ObjectFormatter();
 			var maybeAccessor = '@maybe';
@@ -286,6 +350,105 @@ describe('object-formatter', () => {
 	});
 
 	describe('_isSimpleAccessor', () => {
+		it('should return true', done => {
+			var of = new ObjectFormatter();
+			var maybeSimpleAccessors = [
+				'@a',
+				'@a.b',
+				'@a.b.c',
+				'@@',
+				'@@.@@.@@@',
+				'@_._._',
+				'@ . . ',
+				'@a=null',
+				'@a.b=true',
+				'@a.b.c=undefined',
+				'@a.b.c.d="str"',
+				'@a.b.c.d.e=111',
+				'@1={}',
+				'@1.2={key:"val"}',
+				'@1.2.3=[]',
+				'@1.2.3.4=[1,{},[]]'
+			];
+
+			maybeSimpleAccessors.forEach(maybeSimpleAccessor => {
+				assert.ok(of._isSimpleAccessor(maybeSimpleAccessor));
+			});
+			done();
+		});
+		it('should return true with fixed accessor symbol', done => {
+			var of = new ObjectFormatter('~');
+			var maybeSimpleAccessors = [
+				'~a',
+				'~a.b',
+				'~a.b.c',
+				'~@',
+				'~@~',
+				'~~.~~.~~',
+				'~_._._',
+				'~ . . ',
+				'~a=null',
+				'~a.b=true',
+				'~a.b.c=undefined',
+				'~a.b.c.d="str"',
+				'~a.b.c.d.e=111',
+				'~1={}',
+				'~1.2={key:"val"}',
+				'~1.2.3=[]',
+				'~1.2.3.4=[1,{},[]]'
+			];
+
+			maybeSimpleAccessors.forEach(maybeSimpleAccessor => {
+				assert.ok(of._isSimpleAccessor(maybeSimpleAccessor));
+			});
+			done();
+		});
+		it('should return false', done => {
+			var of = new ObjectFormatter();
+			var maynotbeSimpleAccessors = [
+				1,
+				false,
+				null,
+				undefined,
+				{},
+				[],
+				'',
+				'a',
+				'a.b.c',
+				'a.@hoge',
+				' @'
+			];
+
+			maynotbeSimpleAccessors.forEach(maynotbeSimpleAccessor => {
+				assert.ok(!of._isSimpleAccessor(maynotbeSimpleAccessor));
+			});
+			done();
+		});
+		it('should return false with fixed accessor symbol', done => {
+			var of = new ObjectFormatter('?');
+			var maynotbeSimpleAccessors = [
+				'@a.b.c',
+				'@a=null',
+				'@@@',
+				'@.@.@',
+				1,
+				false,
+				null,
+				undefined,
+				{},
+				[],
+				'',
+				'a',
+				'a.b.c',
+				'a.@hoge',
+				' @'
+			];
+
+			maynotbeSimpleAccessors.forEach(maynotbeSimpleAccessor => {
+				assert.ok(!of._isSimpleAccessor(maynotbeSimpleAccessor));
+			});
+			done();
+		});
 		it('should return true with default accessor symbol', done => {
 			var of = new ObjectFormatter();
 
@@ -326,6 +489,89 @@ describe('object-formatter', () => {
 	});
 
 	describe('_isCollectionAccessor', () => {
+		it('should return true', done => {
+			var of = new ObjectFormatter();
+			var maybeCollectionAccessors = [
+				['@a', '@a'],
+				['@a.b.c', '@d.e.f'],
+				['@@', '@@'],
+				['@a=null', '@@=null'],
+				['@a.b.c', {}],
+				['@a=null', {hoge:'fuga'}],
+				['@null=null', {a:{b:{c:[1,2,3]}}}],
+				['@null=null', {a:{b:{c:'@a.b.c'}}}]
+			];
+
+			maybeCollectionAccessors.forEach(maybeCollectionAccessor => {
+				assert.ok(of._isCollectionAccessor(maybeCollectionAccessor));
+			});
+			done();
+		});
+		it('should return true with fixed accessor symbol', done => {
+			var of = new ObjectFormatter('~~');
+			var maybeCollectionAccessors = [
+				['~~a', '~~a'],
+				['~~a.b.c', '~~d.e.f'],
+				['~~@', '~~@@'],
+				['~~a=null', '~~@=null'],
+				['~~a.b.c', {}],
+				['~~a=null', {hoge:'fuga'}],
+				['~~null=null', {a:{b:{c:[1,2,3]}}}],
+				['~~null=null', {a:{b:{c:'@a.b.c'}}}]
+			];
+
+			maybeCollectionAccessors.forEach(maybeCollectionAccessor => {
+				assert.ok(of._isCollectionAccessor(maybeCollectionAccessor));
+			});
+			done();
+		});
+		it('should return false', done => {
+			var of = new ObjectFormatter();
+			var maynotbeCollectionAccessors = [
+				1,
+				true,
+				'@a',
+				{},
+				[],
+				['@a'],
+				['@a.b.c', 'd.e.f'],
+				['@@', ''],
+				[true, '@a.b'],
+				['@a.b.c', 1],
+				['@a=null', null]
+			];
+
+			maynotbeCollectionAccessors.forEach(maynotbeCollectionAccessor => {
+				assert.ok(!of._isCollectionAccessor(maynotbeCollectionAccessor));
+			});
+			done();
+		});
+		it('should return false with fixed accessor symbol', done => {
+			var of = new ObjectFormatter('$');
+			var maynotbeCollectionAccessors = [
+				1,
+				true,
+				'@a',
+				'$a.b',
+				{},
+				[],
+				['$a'],
+				['$a.b.c', 'd.e.f'],
+				['$@', ''],
+				[true, '$a.b'],
+				['$a.b.c', 1],
+				['$a=null', null],
+				['$a', '@a'],
+				['$a.b.c', '@d.e.f'],
+				['$@', '@@@'],
+				['$a=null', '@@=null']
+			];
+
+			maynotbeCollectionAccessors.forEach(maynotbeCollectionAccessor => {
+				assert.ok(!of._isCollectionAccessor(maynotbeCollectionAccessor));
+			});
+			done();
+		});
 		it('should return true with default accessor symbol', done => {
 			var of = new ObjectFormatter();
 
@@ -400,6 +646,49 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getValueWithAccessor', () => {
+		it('ok', done => {
+			var of = new ObjectFormatter();
+
+			var stricteqArgs = [
+				// { accessor: '@a', object: null, result: undefined }, TODO: fix
+				{ accessor: '@a', object: {a:1}, result: 1 },
+				{ accessor: '@a', object: {}, result: undefined },
+				{ accessor: '@', object: {}, result: undefined },
+				{ accessor: '@a.b.c', object: {a:{'b':{c:2}}}, result: 2 },
+				{ accessor: '@a.a.a', object: {a:1}, result: undefined },
+				{ accessor: '@', object: {a:1}, result: undefined },
+				{ accessor: '@@', object: {'@':3}, result: 3 },
+				{ accessor: '@a=null', object: {a:1}, result: 1 },
+				{ accessor: '@a.b=null', object: {a:1}, result: null },
+				{ accessor: '@=111', object: {a:1}, result: 111 },
+				{ accessor: 'invalid', object: {a:1}, result: undefined },
+				{ accessor: '@a.1', object: {a:['a', 'aa', 'aaa']}, result: 'aa' },
+				// { accessor: '@a.1.b', object: {a:['a', {b:'aa'}, 'aaa']}, result: 'aa' }, TODO: fix
+				{ accessor: '@a.100', object: {a:['a', 'aa', 'aaa']}, result: undefined },
+				{ accessor: '@a.100="default"', object: {a:['a', 'aa', 'aaa']}, result: 'default' },
+				{ accessor: '@a.this.b', object: {a:1,b:5}, result: undefined },
+				{ accessor: '@a.length', object: {a:[1,2,3]}, result: 3 }
+			];
+			stricteqArgs.forEach(arg => {
+				assert.strictEqual(of._getValueWithAccessor(arg.accessor, arg.object), arg.result);
+			});
+
+			var deepeqArgs = [
+				{ accessor: '@a', object: {a:[1,2,3]}, result: [1,2,3] },
+				{ accessor: '@a.b=[{},{a:"s"}, 5]', object: {a:1}, result: [{},{a:'s'}, 5] },
+				// { accessor: '@a.0.a', object: {a:[{a: ['aa']}], b:9}, result: ['aa'] }, TODO: fix
+				{ accessor: '@@.@@.@@@=5', object: {'@':{'@@':{'@@@':{'@@@@':0}}}}, result: {'@@@@':0} },
+				{ accessor: ['@a.c', '@b'], object: {a:{c:[ {b:1}, {b:2}, {} ]}}, result: [1,2,undefined] },
+				// { accessor: ['@a.c', '@b'], object: {a:{c:[ {b:1}, null, {} ]}}, result: [1,undefined,undefined] }, TODO: fix
+				{ accessor: ['@a.c', '@b=3'], object: {a:{c:[ {b:1}, {b:2}, {} ]}}, result: [1,2,3] },
+				{ accessor: ['@a.c', {p:['@b', '@c']}], object: {a:{c:[ {b:[{c:1},{c:2}]}, {b:[{c:3}]}, {b:[{}]} ]}}, result: [{p:[1,2]},{p:[3]},{p:[undefined]}] },
+			];
+			deepeqArgs.forEach(arg => {
+				assert.deepEqual(of._getValueWithAccessor(arg.accessor, arg.object), arg.result);
+			});
+
+			done();
+		});
 		it('should return value of simple accessor when accessor is simple accessor', done => {
 			var of = new ObjectFormatter();
 			var accessor = '@a.c';
@@ -483,6 +772,23 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getValueWithSimpleAccessor', () => {
+		it('ok', done => {
+			var of = new ObjectFormatter();
+
+			var stricteqArgs = [
+				{ accessor: '@a', object: {a:1}, result: 1 },
+			];
+			stricteqArgs.forEach(arg => {
+				assert.strictEqual(of._getValueWithSimpleAccessor(arg.accessor, arg.object), arg.result);
+			});
+
+			var deepeqArgs = [];
+			deepeqArgs.forEach(arg => {
+				assert.deepEqual(of._getValueWithSimpleAccessor(arg.accessor, arg.object), arg.result);
+			});
+
+			done();
+		});
 		it('should return temporary default value when object has no value of path', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@simple.accessor';
@@ -522,6 +828,8 @@ describe('object-formatter', () => {
 	});
 
 	describe('_isCollectionReturned', () => {
+		it('should return true');
+		it('should return false');
 		it('should return false when returned value is undefined', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@a.b.c';
@@ -549,6 +857,7 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getValueWithCollectionAccessor', () => {
+		it('ok');
 		it('should return array value accessor[1] is simple accessor', done => {
 			var of = new ObjectFormatter();
 			var collectionAccessor = ['@path.to.collection', '@simple.accessor'];
@@ -624,6 +933,7 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getArrayValueWithCollection', () => {
+		it('ok');
 		it('should return mapped values', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@simple.accessor';
@@ -644,6 +954,7 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getCollectionValueWithCollection', () => {
+		it('ok');
 		it('should return mapped value', done => {
 			var of = new ObjectFormatter();
 			var schemaObject = {
@@ -680,6 +991,7 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getDefaultValueFromSimpleAccessor', () => {
+		it('ok');
 		it('should return raw default value when simple accessor with no default', done => {
 			var of = new ObjectFormatter('@', '-----');
 			var simpleAccessor = '@a.b.c';
@@ -732,6 +1044,7 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getPathFromSimpleAccessor', () => {
+		it('ok');
 		it('should return path string with no default', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@simple.path.string';

@@ -9,7 +9,8 @@ format object safely
 ## Usage
 
 ```javascript
-var of = require('object-formatter');
+var ObjectFormat = require('object-formatter');
+var of = new ObjectFormat();
 
 var object = {
     a: 'lorem',
@@ -26,7 +27,7 @@ var object = {
 };
 
 var schema = {
-    test: '"raw value"',
+    raw: '"raw value"',
     foo: '@a',
     bar: '@b.c.d="ipsum"',
     baz: {
@@ -36,14 +37,14 @@ var schema = {
            hoge: '@aa',
            fuga: '@bb="bbb"'
         } ],
-        d: ['@d' '@cc="c--"' ]
+        d: [ '@d', '@cc="c--"' ]
     }
 };
 
 of.format(schema, object);
 // ->
 // {
-//     test: 'raw value',
+//     raw: 'raw value',
 //     foo: 'lorem',
 //     bar: 'ipsum',
 //     baz: {
@@ -59,21 +60,11 @@ of.format(schema, object);
 // };
 ```
 
-## Methods and Properties
+## Constructor
 
-### `of.accessor`
+### ObjectFormatter(accessorSymbol='@', defaultValue=undefined)
 
-It is a formatter's accessor symbol. gettable/settable
-
-__default `'@'`__
-
-
-### `of.default`
-
-It is a default value of unaccessable path. gettable/settable
-
-__default `undefined`__
-
+## Instance methods
 
 ### `of.format(schema, object)` -> `object`
 

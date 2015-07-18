@@ -2,10 +2,15 @@
   "name": "object-formatter",
   "version": "0.0.1",
   "description": "format object safely",
-  "main": "index.js",
+  "main": "lib/object-formatter.js",
   "scripts": {
-    "test": "mocha -R spec --recursive test"
+    "build": "babel src --out-dir lib --source-maps inline",
+    "watch": "babel src --out-dir lib --watch --source-maps inline",
+    "test": "npm run build && mocha -R spec --compilers js:babel/register --recursive test"
   },
+  "files": [
+    "lib"
+  ],
   "keywords": [
     "object",
     "format",
@@ -14,5 +19,13 @@
     "formatter"
   ],
   "author": "airtoxin <airtoxin@icloud.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^5.6.23",
+    "mocha": "^2.2.5"
+  },
+  "dependencies": {
+    "get-value": "^1.1.5",
+    "lodash": "^3.10.0"
+  }
 }

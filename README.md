@@ -1,4 +1,4 @@
-# object-formatter
+# object-formatter [![Build Status](https://travis-ci.org/airtoxin/object-formatter.svg)](https://travis-ci.org/airtoxin/object-formatter)
 
 format object safely
 

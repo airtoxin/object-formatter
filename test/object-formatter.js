@@ -650,7 +650,7 @@ describe('object-formatter', () => {
 			var of = new ObjectFormatter();
 
 			var stricteqArgs = [
-				// { accessor: '@a', object: null, result: undefined }, TODO: fix
+				{ accessor: '@a', object: null, result: undefined },
 				{ accessor: '@a', object: {a:1}, result: 1 },
 				{ accessor: '@a', object: {}, result: undefined },
 				{ accessor: '@', object: {}, result: undefined },
@@ -663,7 +663,7 @@ describe('object-formatter', () => {
 				{ accessor: '@=111', object: {a:1}, result: 111 },
 				{ accessor: 'invalid', object: {a:1}, result: undefined },
 				{ accessor: '@a.1', object: {a:['a', 'aa', 'aaa']}, result: 'aa' },
-				// { accessor: '@a.1.b', object: {a:['a', {b:'aa'}, 'aaa']}, result: 'aa' }, TODO: fix
+				{ accessor: '@a.1.b', object: {a:['a', {b:'aa'}, 'aaa']}, result: 'aa' },
 				{ accessor: '@a.100', object: {a:['a', 'aa', 'aaa']}, result: undefined },
 				{ accessor: '@a.100="default"', object: {a:['a', 'aa', 'aaa']}, result: 'default' },
 				{ accessor: '@a.this.b', object: {a:1,b:5}, result: undefined },
@@ -676,10 +676,10 @@ describe('object-formatter', () => {
 			var deepeqArgs = [
 				{ accessor: '@a', object: {a:[1,2,3]}, result: [1,2,3] },
 				{ accessor: '@a.b=[{},{a:"s"}, 5]', object: {a:1}, result: [{},{a:'s'}, 5] },
-				// { accessor: '@a.0.a', object: {a:[{a: ['aa']}], b:9}, result: ['aa'] }, TODO: fix
+				{ accessor: '@a.0.a', object: {a:[{a: ['aa']}], b:9}, result: ['aa'] },
 				{ accessor: '@@.@@.@@@=5', object: {'@':{'@@':{'@@@':{'@@@@':0}}}}, result: {'@@@@':0} },
 				{ accessor: ['@a.c', '@b'], object: {a:{c:[ {b:1}, {b:2}, {} ]}}, result: [1,2,undefined] },
-				// { accessor: ['@a.c', '@b'], object: {a:{c:[ {b:1}, null, {} ]}}, result: [1,undefined,undefined] }, TODO: fix
+				{ accessor: ['@a.c', '@b'], object: {a:{c:[ {b:1}, null, {} ]}}, result: [1,undefined,undefined] },
 				{ accessor: ['@a.c', '@b=3'], object: {a:{c:[ {b:1}, {b:2}, {} ]}}, result: [1,2,3] },
 				{ accessor: ['@a.c', {p:['@b', '@c']}], object: {a:{c:[ {b:[{c:1},{c:2}]}, {b:[{c:3}]}, {b:[{}]} ]}}, result: [{p:[1,2]},{p:[3]},{p:[undefined]}] },
 			];

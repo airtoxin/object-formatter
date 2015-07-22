@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import get from 'get-value';
+import get from 'recursive-get';
 import isObject from 'isobject';
 
 class ObjectFormatter {
@@ -10,7 +10,7 @@ class ObjectFormatter {
 	}
 
 	/**
-	 * format object
+	 * format object to schema
 	 * @param  {Object} schema - format schema object
 	 * @param  {Object} object - target object
 	 * @return {Object} - formatted object

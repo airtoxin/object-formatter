@@ -1,6 +1,6 @@
 {
   "name": "object-formatter",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "format object safely",
   "main": "lib/object-formatter.js",
   "scripts": {

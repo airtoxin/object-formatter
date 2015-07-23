@@ -62,6 +62,8 @@ of.format(schema, object);
 // }
 ```
 
+more examples, see [test file](test/object-formatter.js)
+
 ## Constructor
 
 ### ObjectFormatter(accessorSymbol='@', defaultValue=undefined)
@@ -86,9 +88,21 @@ If value is string and start with of.accessor(`@`), it means new value's path. I
 
 It accesses `object.path.to.value`. Fields of object are separate with `.` like a javascript.
 
+```javascript
+var object = { a: { b: ['this', 'is', 'a.b'] } };
+of.format({ result: '@a.b' }, object);
+// -> { result: ['this', 'is', 'a.b'] }
+```
+
 #### `@path.to.value="temporary default"`
 
 `=` means temporary default value. That definition accesses `object.path.to.value` and returns exact value, or `'temporary default'` value when path doesn't exist.
+
+```javascript
+var object = { a: { b: ['this', 'is', 'a.b'] } };
+of.format({ result: '@a.b.c="not exists"' }, object);
+// -> { result: 'not exists' }
+```
 
 ### Collection accessor
 
@@ -98,6 +112,18 @@ The array value that 1st arg is path string and 2nd arg is schema object or path
 
 It returns array (maybe not collection). 2nd arg's path refers to collection's element object.
 
+```javascript
+var object = { a: [{ b: 1 }, { b: 2 }, { b:3 }] };
+of.format({ result: ['@a', '@b'] });
+// -> { result: [1, 2, 3] }
+```
+
 #### `["@path.to.collection", schema]`
 
 It returns collection. 2nd arg's schema object is schema of collection's element object.
+
+```javascript
+var object = { a: [{ b: 1 }, { b: 2 }, { b:3 }] };
+of.format({ result: ['@a', { new_b: '@b' }] });
+// -> { result: [{ new_b: 1 }, { new_b: 2 }, { new_b: 3 }] }
+```

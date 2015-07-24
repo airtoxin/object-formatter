@@ -828,8 +828,50 @@ describe('object-formatter', () => {
 	});
 
 	describe('_isCollectionReturned', () => {
-		it('should return true');
-		it('should return false');
+		it('should return true', done => {
+			var of = new ObjectFormatter();
+			var simpleAccessors = [
+				'@c',
+				'@d.e',
+				'@c=1',
+				'@d.e=1',
+				// '@a=[{a:1}]', TODO: think this
+				'@e'
+			];
+			var object = {
+				c: [ {aa:11}, {bb:22}, {cc:33} ],
+				d: {
+					e: [ {aaa:111}, {bbb:222}, {ccc:333} ]
+				},
+				e: [{}]
+			};
+
+			simpleAccessors.forEach(simpleAccessor => {
+				assert.ok(of._isCollectionReturned(simpleAccessor, object));
+			});
+			done();
+		});
+		it('should return false', done => {
+			var of = new ObjectFormatter();
+			var simpleAccessors = [
+				'@a',
+				'@b',
+				'@c.aa',
+				'@d'
+			];
+			var object = {
+				c: [ {aa:11}, {bb:22}, {cc:33} ],
+				d: {
+					e: [ {aaa:111}, {bbb:222}, {ccc:333} ]
+				},
+				e: [{}]
+			};
+
+			simpleAccessors.forEach(simpleAccessor => {
+				assert.ok(!of._isCollectionReturned(simpleAccessor, object));
+			});
+			done();
+		});
 		it('should return false when returned value is undefined', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@a.b.c';
@@ -857,7 +899,32 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getValueWithCollectionAccessor', () => {
-		it('ok');
+		it('ok', done => {
+			var of = new ObjectFormatter();
+			var collectionAccessorWithSimple = ['@a.b', '@c.d'];
+			var collectionAccessorWithSchema = ['@a.b', { x: '@c.d' }];
+			var object = {
+				a: {
+					b: [ {
+						c: { d: 1 }
+					}, {
+						c: { d: 2 }
+					}, {
+						c: 'not object'
+					} ]
+				}
+			};
+
+			var valueSimple = of._getValueWithCollectionAccessor(collectionAccessorWithSimple, object);
+			var expectedSimple = [ 1, 2, undefined ];
+			assert.deepEqual(valueSimple, expectedSimple);
+
+			var valueSchema = of._getValueWithCollectionAccessor(collectionAccessorWithSchema, object);
+			var expectedSchema = [ { x: 1 }, { x: 2 }, { x: undefined } ];
+			assert.deepEqual(valueSchema, expectedSchema);
+
+			done();
+		});
 		it('should return array value accessor[1] is simple accessor', done => {
 			var of = new ObjectFormatter();
 			var collectionAccessor = ['@path.to.collection', '@simple.accessor'];
@@ -933,7 +1000,26 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getArrayValueWithCollection', () => {
-		it('ok');
+		it('ok', done => {
+			var of = new ObjectFormatter();
+			var collection = [
+				{ a: 'a1', b: 'b1' },
+				{ a: 'a2' },
+				{}
+			];
+			var data = [
+				{ simpleAccessor: '@a', result: ['a1', 'a2', undefined] },
+				{ simpleAccessor: '@b', result: ['b1', undefined, undefined] },
+				{ simpleAccessor: '@c', result: [undefined, undefined, undefined] },
+				{ simpleAccessor: '@c="a"', result: ["a", "a", "a"] }
+			];
+
+			data.forEach(asset => {
+				var value = of._getArrayValueWithCollection(asset.simpleAccessor, collection);
+				assert.deepEqual(value, asset.result);
+			});
+			done();
+		});
 		it('should return mapped values', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@simple.accessor';
@@ -954,7 +1040,25 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getCollectionValueWithCollection', () => {
-		it('ok');
+		it('ok', done => {
+			var of = new ObjectFormatter();
+			var collection = [
+				{ a: 'a1', b: 'b1' },
+				{ a: 'a2' },
+				{}
+			];
+			var data = [
+				{ schema: {p:'q'}, result: [{p:'q'}, {p:'q'}, {p:'q'}] },
+				{ schema: {p:'@a'}, result: [{p:'a1'}, {p:'a2'}, {p:undefined}] },
+				{ schema: {p:'@b=1'}, result: [{p:'b1'}, {p:1}, {p:1}] },
+			];
+
+			data.forEach(asset => {
+				var value = of._getCollectionValueWithCollection(asset.schema, collection);
+				assert.deepEqual(value, asset.result);
+			});
+			done();
+		});
 		it('should return mapped value', done => {
 			var of = new ObjectFormatter();
 			var schemaObject = {
@@ -991,7 +1095,25 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getDefaultValueFromSimpleAccessor', () => {
-		it('ok');
+		it('ok', done => {
+			var of = new ObjectFormatter();
+			var data = [
+				{ accessor: '@a', result: undefined },
+				{ accessor: '@a.b.c.d', result: undefined },
+				{ accessor: '@a=null', result: null },
+				{ accessor: '@a=1', result: 1 },
+				{ accessor: '@a="null"', result: "null" },
+				{ accessor: '@a=undefined', result: undefined },
+				{ accessor: '@a===1', result: undefined },
+				{ accessor: '@a=a=a', result: undefined }
+			];
+
+			data.forEach(asset => {
+				var value = of._getDefaultValueFromSimpleAccessor(asset.accessor);
+				assert.deepEqual(value, asset.result);
+			});
+			done();
+		});
 		it('should return raw default value when simple accessor with no default', done => {
 			var of = new ObjectFormatter('@', '-----');
 			var simpleAccessor = '@a.b.c';
@@ -1044,7 +1166,21 @@ describe('object-formatter', () => {
 	});
 
 	describe('_getPathFromSimpleAccessor', () => {
-		it('ok');
+		it('ok', done => {
+			var of = new ObjectFormatter();
+			var data = [
+				{ accessor: '@a', result: 'a' },
+				{ accessor: '@a.b.c', result: 'a.b.c' },
+				{ accessor: '@a.b.c=7824', result: 'a.b.c' },
+				{ accessor: '@a.b.c===', result: 'a.b.c' }
+			];
+
+			data.forEach(asset => {
+				var value = of._getPathFromSimpleAccessor(asset.accessor);
+				assert.strictEqual(value, asset.result);
+			});
+			done();
+		});
 		it('should return path string with no default', done => {
 			var of = new ObjectFormatter();
 			var simpleAccessor = '@simple.path.string';

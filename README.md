@@ -1,4 +1,4 @@
-# object-formatter [![Build Status](https://travis-ci.org/airtoxin/object-formatter.svg)](https://travis-ci.org/airtoxin/object-formatter)
+# object-formatter [![Build Status](https://travis-ci.org/airtoxin/object-formatter.svg)](https://travis-ci.org/airtoxin/object-formatter) [![npm version](https://badge.fury.io/js/object-formatter.svg)](http://badge.fury.io/js/object-formatter)
 
 format object safely
 

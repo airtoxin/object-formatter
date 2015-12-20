@@ -21,12 +21,12 @@
   "author": "airtoxin <airtoxin@icloud.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel": "^5.6.23",
-    "istanbul": "^0.3.17",
+    "babel": "^6.3.13",
+    "istanbul": "^0.4.1",
     "mocha": "^2.2.5"
   },
   "dependencies": {
-    "isobject": "^1.0.2",
+    "isobject": "^2.0.0",
     "lodash": "^3.10.0",
     "recursive-get": "0.0.0"
   }

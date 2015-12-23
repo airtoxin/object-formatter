@@ -2,11 +2,12 @@
   "name": "object-formatter",
   "version": "1.0.1",
   "description": "format object safely",
-  "repository": "https://github.com/airtoxin/object-formatter",
+  "repository": "airtoxin/object-formatter",
   "main": "lib/object-formatter.js",
   "scripts": {
-    "build": "babel src -d lib",
-    "test": "npm run build && NODE_ENV=test mocha --compilers js:babel-register --recursive test/"
+    "start": "babel src -d lib",
+    "test": "npm run start && NODE_ENV=test mocha --compilers js:babel-register --recursive test/",
+    "prepublish": "npm test && npm start"
   },
   "files": [
     "lib"

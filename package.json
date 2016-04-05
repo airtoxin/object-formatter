@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "isobject": "^1.0.2",
-    "lodash": "^4.0.0",
+    "lodash": "^4.8.2",
     "recursive-get": "0.0.0"
   }
 }

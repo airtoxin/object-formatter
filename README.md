@@ -9,10 +9,10 @@ format object safely
 ## Usage
 
 ```javascript
-var ObjectFormat = require('object-formatter');
-var of = new ObjectFormat();
+import ObjectFormat from 'object-formatter';
+const fmt = new ObjectFormat();
 
-var object = {
+const object = {
     a: 'lorem',
     b: 'hoge',
     c: {
@@ -26,7 +26,7 @@ var object = {
     ]
 };
 
-var schema = {
+const schema = {
     raw: 'raw value',
     foo: '@a',
     bar: '@b.c.d="ipsum"',
@@ -42,7 +42,7 @@ var schema = {
     }
 };
 
-of.format(schema, object);
+fmt.format(schema, object);
 // ->
 // {
 //     raw: 'raw value',
